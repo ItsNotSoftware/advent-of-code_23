@@ -96,7 +96,7 @@ fn replace_spelled_numbers(s: &String) -> String {
 }
 
 fn part1(filename: &str) -> u32 {
-    let input = utils::read_input(filename);
+    let input = utils::read_lines(filename);
     let mut sum = 0;
 
     for line in &input {
@@ -107,7 +107,7 @@ fn part1(filename: &str) -> u32 {
 }
 
 fn part2(filename: &str) -> u32 {
-    let input = utils::read_input(filename);
+    let input = utils::read_lines(filename);
     let mut sum = 0;
 
     for line in &input {
