@@ -20,6 +20,16 @@ fn get_number(line: &str) -> u32 {
 
 fn slice_to_number(slice: &str) -> Option<&str> {
     return match slice {
+        "0" => Some("0"),
+        "1" => Some("1"),
+        "2" => Some("2"),
+        "3" => Some("3"),
+        "4" => Some("4"),
+        "5" => Some("5"),
+        "6" => Some("6"),
+        "7" => Some("7"),
+        "8" => Some("8"),
+        "9" => Some("9"),
         "zero" => Some("0"),
         "one" => Some("1"),
         "two" => Some("2"),
@@ -43,26 +53,41 @@ fn replace_with_number(s: &String, start: usize, end: usize, number: &str) -> St
     return new_s;
 }
 
+// ! This function was design to replace all numbers insted of just the first and the last.
+// ! Althogh this worked in teory it failed on some inputs like "9twone",
+// ! because it would read "two" before reading "one" producing "92ne" instead of "9tw1"
+// ! For that a dirty fix was implemented, not the prettiest but it works... ¯\_( ͡° ͜ʖ ͡°)_/¯
 fn replace_spelled_numbers(s: &String) -> String {
-    let mut new_s = s.clone(); // Changed to own the String instead of a reference
-    let mut flag = true;
+    let mut new_s = s.clone();
 
-    'outer: while flag {
-        flag = false;
+    // Get first number
+    'outer: for i in 0..new_s.len() {
+        for j in i..=new_s.len() {
+            let slice = &new_s[i..j]; // Changed to new_s
+            let result = slice_to_number(slice);
 
-        for i in 0..new_s.len() {
-            for j in i..=new_s.len() {
-                let slice = &new_s[i..j]; // Changed to new_s
-                let result = slice_to_number(slice);
-
-                match result {
-                    Some(number) => {
-                        new_s = replace_with_number(&new_s, i, j - 1, number); // new_s now correctly holds an owned String
-                        flag = true;
-                        continue 'outer;
-                    }
-                    None => continue,
+            match result {
+                Some(number) => {
+                    new_s = replace_with_number(&new_s, i, j - 1, number);
+                    break 'outer;
                 }
+                None => continue,
+            }
+        }
+    }
+
+    // Get last number
+    'outer: for i in (0..new_s.len()).rev() {
+        for j in (i..=new_s.len()).rev() {
+            let slice = &new_s[i..j]; // Changed to new_s
+            let result = slice_to_number(slice);
+
+            match result {
+                Some(number) => {
+                    new_s = replace_with_number(&new_s, i, j - 1, number);
+                    break 'outer;
+                }
+                None => continue,
             }
         }
     }
@@ -87,8 +112,6 @@ fn part2(filename: &str) -> u32 {
 
     for line in &input {
         let filtered_line = replace_spelled_numbers(&line);
-        // println!("Filtered Line: {}", filtered_line);
-        println!("{}", get_number(&filtered_line));
         sum += get_number(&filtered_line);
     }
 
@@ -142,7 +165,7 @@ mod tests {
     fn test_replace_spelled_numbers() {
         let mut test_s = String::from("5one5twothreea3zero");
         let result = replace_spelled_numbers(&mut test_s);
-        assert_eq!(result, "51523a30");
+        assert_eq!(result, "5one5twothreea30");
 
         let mut test_s = String::from("two1nine");
         let s = replace_spelled_numbers(&mut test_s);
@@ -186,6 +209,3 @@ mod tests {
         assert_eq!(result, 281);
     }
 }
-
-//ans : 54094
-//m: 54110
