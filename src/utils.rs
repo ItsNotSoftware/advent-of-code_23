@@ -16,6 +16,22 @@ pub fn read_lines(filename: &str) -> Vec<String> {
     return lines;
 }
 
+pub fn read_chars(filename: &str) -> Vec<Vec<char>> {
+    let file = File::open(filename).expect("Failed to open file");
+
+    let reader = BufReader::new(file);
+    let mut vec: Vec<Vec<char>> = Vec::new();
+
+    for line in reader.lines() {
+        if let Ok(line_contents) = line {
+            let chars: Vec<char> = line_contents.chars().filter(|&c| c != '\n').collect();
+            vec.push(chars);
+        }
+    }
+
+    return vec;
+}
+
 pub fn read_file(filename: &str) -> String {
     let mut file = match File::open(filename) {
         Ok(file) => file,
