@@ -69,6 +69,17 @@ fn parse_input(filename: &str) -> (Vec<u64>, Vec<MapTo>) {
     return (seeds, mapto_vec);
 }
 
+fn print_iter_n(seeds: Vec<u64>) {
+    let sum: u64 = seeds
+        .iter()
+        .enumerate()
+        .filter(|&(i, _)| i % 2 == 1)
+        .map(|(_, &val)| val)
+        .sum();
+
+    println!("[Total number of iterations = {}]", sum);
+}
+
 fn part1(filename: &str) -> u64 {
     let (seeds, mapto_vec) = parse_input(filename);
     let mut lowest_location = u64::MAX;
@@ -89,7 +100,27 @@ fn part1(filename: &str) -> u64 {
 }
 
 fn part2(filename: &str) -> u64 {
-    return 0;
+    let (seeds, mapto_vec) = parse_input(filename);
+    let mut lowest_location = u64::MAX;
+    let mut counter: u64 = 0;
+
+    for i in (0..seeds.len()).step_by(2) {
+        for seed in seeds[i]..(seeds[i] + seeds[i + 1]) {
+            let mut curr_number = seed;
+
+            for mapping in &mapto_vec {
+                curr_number = mapping.src_to_dest(curr_number);
+            }
+
+            if curr_number < lowest_location {
+                lowest_location = curr_number;
+            }
+        }
+        println!("Finished: {}", counter);
+        counter += 1;
+    }
+
+    return lowest_location;
 }
 
 fn main() {
@@ -136,5 +167,11 @@ mod tests {
     fn test_part1() {
         let result = part1("examples/day05.txt");
         assert_eq!(result, 35);
+    }
+
+    #[test]
+    fn test_part2() {
+        let result = part2("examples/day05.txt");
+        assert_eq!(result, 46);
     }
 }
