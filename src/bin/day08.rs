@@ -1,6 +1,7 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
+use std::cmp;
 use std::collections::HashMap;
 use utils;
 
@@ -64,6 +65,24 @@ fn get_starting_nodes(filename: &str) -> Vec<String> {
     return starting_nodes;
 }
 
+fn gcd(a: u64, b: u64) -> u64 {
+    if b == 0 {
+        return a;
+    } else {
+        return gcd(b, a % b);
+    }
+}
+
+fn lcm(a: u64, b: u64) -> u64 {
+    return a / gcd(a, b) * b;
+}
+
+fn lcm_vec(numbers: Vec<u64>) -> u64 {
+    return numbers
+        .iter()
+        .fold(1, |acc, &num| lcm(acc, cmp::max(num, 1)));
+}
+
 fn part1(filename: &str) -> u32 {
     let (instructions, map) = parse_input(filename);
     let mut current_node: &str = "AAA";
@@ -81,31 +100,25 @@ fn part1(filename: &str) -> u32 {
 }
 
 fn part2(filename: &str) -> u64 {
-    let mut current_nodes = get_starting_nodes(&filename);
+    let mut starting_nodes = get_starting_nodes(&filename);
     let (instructions, map) = parse_input(filename);
-    let mut i: usize = 0;
-    let mut steps = 0;
-    let mut end_position: bool = false;
+    let mut steps: Vec<u64> = vec![];
 
-    while !end_position {
-        end_position = true;
-        let dir = instructions[i];
+    for node in &mut starting_nodes {
+        let mut i: usize = 0;
+        let mut counter: u64 = 0;
 
-        for j in 0..current_nodes.len() {
-            current_nodes[j] = map[&current_nodes[j].to_string()]
-                .get_next_node(dir)
-                .to_string();
+        while !node.ends_with("Z") {
+            let dir = instructions[i];
+            *node = map[&node.to_string()].get_next_node(dir).to_string();
 
-            if !current_nodes[j].ends_with("Z") {
-                end_position = false;
-            }
+            counter += 1;
+            i = (i + 1) % instructions.len();
         }
-
-        steps += 1;
-        i = (i + 1) % instructions.len();
+        steps.push(counter);
     }
 
-    return steps;
+    return lcm_vec(steps);
 }
 
 fn main() {
