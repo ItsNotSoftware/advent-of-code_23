@@ -77,7 +77,6 @@ fn mark_path(map: &Map) -> Map {
                 break;
             }
             if map[pos[0]][pos[1]] == 'S' {
-                print_mat(&map);
                 return new_map;
             }
 
@@ -148,6 +147,18 @@ fn remove_outsiders(map: &mut Map) {
     }
 }
 
+fn is_inside(map: &Map, marker: &Map, point: [usize; 2]) -> bool {
+    let mut cross_count = 0;
+    let i = point[0];
+
+    for j in 0..point[1] {
+        if marker[i][j] == '#' && (map[i][j] == '|' || map[i][j] == 'J' || map[i][j] == 'L') {
+            cross_count += 1;
+        }
+    }
+    return cross_count % 2 != 0;
+}
+
 fn part1(filename: &str) -> u32 {
     let map: Map = utils::read_chars(filename);
     let starting_pos = find_starting_pos(&map);
@@ -195,24 +206,26 @@ fn part1(filename: &str) -> u32 {
 
 fn part2(filename: &str) -> u32 {
     let map: Map = utils::read_chars(filename);
-    let mut map = mark_path(&map);
-    remove_outsiders(&mut map);
-    print_mat(&map);
+    let mut markers = mark_path(&map);
+    remove_outsiders(&mut markers);
+    let mut insiders_count = 0;
 
-    let mut count: u32 = 0;
-    for line in map {
-        for c in line {
-            if c != 'O' && c != '#' {
-                count += 1;
+    for i in 0..map.len() {
+        for j in 0..map[0].len() {
+            if markers[i][j] != '#' && markers[i][j] != 'O' {
+                if is_inside(&map, &markers, [i, j]) {
+                    insiders_count += 1;
+                }
             }
         }
     }
-    return count;
+
+    return insiders_count;
 }
 
 fn main() {
     println!("Part1: {}", part1("inputs/day10.txt"));
-    println!("Part2: {}", part2("examples/day10b.txt"));
+    println!("Part2: {}", part2("inputs/day10.txt"));
 }
 
 // *====================== Tests ======================* //
