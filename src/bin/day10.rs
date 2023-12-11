@@ -4,18 +4,6 @@
 type Map = Vec<Vec<char>>;
 type Visited = Vec<Vec<bool>>;
 
-fn print_mat<T>(mat: &[Vec<T>])
-where
-    T: std::fmt::Display,
-{
-    for line in mat {
-        for c in line {
-            print!("{} ", c);
-        }
-        println!();
-    }
-}
-
 fn get_next_step(pipe: &char, momentum: [i32; 2]) -> Option<[i32; 2]> {
     return match pipe {
         '|' => Some([momentum[0], 0]),

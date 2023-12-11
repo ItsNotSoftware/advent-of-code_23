@@ -45,3 +45,15 @@ pub fn read_file(filename: &str) -> String {
 
     return file_contents;
 }
+
+pub fn print_mat<T>(mat: &[Vec<T>])
+where
+    T: std::fmt::Display,
+{
+    for line in mat {
+        for c in line {
+            print!("{} ", c);
+        }
+        println!();
+    }
+}
