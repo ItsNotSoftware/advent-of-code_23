@@ -1,6 +1,8 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
+use rayon::prelude::*;
+
 #[derive(Debug)]
 struct Record {
     springs: Vec<char>,
@@ -46,7 +48,7 @@ impl Record {
         return true;
     }
 
-    fn count_arrangements(&self, i: usize, springs: &mut Vec<char>) -> u32 {
+    fn count_arrangements(&self, i: usize, springs: &mut Vec<char>) -> u64 {
         if i == springs.len() {
             if self.is_valid(springs.to_vec()) {
                 return 1;
@@ -66,6 +68,17 @@ impl Record {
 
         return self.count_arrangements(i + 1, springs);
     }
+
+    fn expand(&mut self) {
+        let mut s1 = self.springs.clone();
+        s1.insert(0, '?');
+        let s2 = self.sizes.clone();
+
+        for i in 0..4 {
+            self.springs.append(&mut s1.clone());
+            self.sizes.append(&mut s2.clone());
+        }
+    }
 }
 
 fn parse_input(filename: &str) -> Vec<Record> {
@@ -79,7 +92,7 @@ fn parse_input(filename: &str) -> Vec<Record> {
     return record_list;
 }
 
-fn part1(filename: &str) -> u32 {
+fn part1(filename: &str) -> u64 {
     let record_list = parse_input(filename);
 
     return record_list
@@ -92,12 +105,23 @@ fn part1(filename: &str) -> u32 {
 }
 
 fn part2(filename: &str) -> u64 {
-    todo!();
+    let mut record_list = parse_input(filename);
+    record_list.iter_mut().for_each(|r| r.expand());
+
+    record_list
+        .par_iter() // Use parallel iterator
+        .map(|r| {
+            let mut springs = r.springs.clone();
+            let count = r.count_arrangements(0, &mut springs);
+            println!("Finished {}", count);
+            return count;
+        })
+        .sum()
 }
 
 fn main() {
     println!("Part1: {}", part1("inputs/day12.txt"));
-    println!("Part2: {}", part2("inputs/day12.txt"));
+    println!("Part2: {}", part2("examples/day12.txt"));
 }
 
 // *====================== Tests ======================* //
@@ -146,5 +170,10 @@ mod tests {
     fn test_part1() {
         let r = part1("examples/day12.txt");
         assert_eq!(21, r);
+    }
+
+    fn test_part2() {
+        let r = part2("examples/day12.txt");
+        assert_eq!(525152, r);
     }
 }
