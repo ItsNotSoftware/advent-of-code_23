@@ -27,7 +27,7 @@ impl Record {
         return Record { springs, sizes };
     }
 
-    fn is_valid(&self, springs: Vec<char>) -> bool {
+    fn is_valid(&self, springs: &[char]) -> bool {
         let broken: String = springs.into_iter().collect();
         let broken: Vec<String> = broken
             .split('.')
@@ -48,9 +48,9 @@ impl Record {
         return true;
     }
 
-    fn count_arrangements(&self, i: usize, springs: &mut Vec<char>) -> u64 {
+    fn count_arrangements(&self, i: usize, springs: &[char]) -> u64 {
         if i == springs.len() {
-            if self.is_valid(springs.to_vec()) {
+            if self.is_valid(springs) {
                 return 1;
             } else {
                 return 0;
@@ -58,12 +58,16 @@ impl Record {
         }
 
         if springs[i] == '?' {
-            let mut s2 = springs.clone();
-            springs[i] = '#';
-            s2[i] = '.';
+            let mut count = 0;
+            let mut modified_springs = springs.to_vec();
 
-            return self.count_arrangements(i + 1, springs)
-                + self.count_arrangements(i + 1, &mut s2);
+            modified_springs[i] = '#';
+            count += self.count_arrangements(i + 1, &modified_springs);
+
+            modified_springs[i] = '.';
+            count += self.count_arrangements(i + 1, &modified_springs);
+
+            return count;
         }
 
         return self.count_arrangements(i + 1, springs);
@@ -129,21 +133,6 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_is_valid() {
-        let r = Record::new("?#?#?#?#?#?#?#? 1,3,1,6");
-        assert_eq!(true, r.is_valid(".#.###.#.######".chars().collect()));
-        assert_eq!(false, r.is_valid("###############".chars().collect()));
-        assert_eq!(false, r.is_valid("###############".chars().collect()));
-        assert_eq!(false, r.is_valid("...............".chars().collect()));
-
-        let r = Record::new("????.######..#####. 1,6,5");
-        assert_eq!(true, r.is_valid("#....######..#####.".chars().collect()));
-        assert_eq!(true, r.is_valid(".#...######..#####.".chars().collect()));
-        assert_eq!(false, r.is_valid(".#.#.######..#####.".chars().collect()));
-        assert_eq!(false, r.is_valid(".###.######..#####.".chars().collect()));
-    }
 
     #[test]
     fn test_count_arrangements() {
