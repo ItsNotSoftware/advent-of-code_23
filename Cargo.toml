@@ -8,3 +8,4 @@ name = "utils"
 path = "src/utils.rs"
 
 [dependencies]
+log = "0.4"
