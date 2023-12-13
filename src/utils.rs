@@ -57,3 +57,36 @@ where
         println!();
     }
 }
+
+pub fn read_matrices(filename: &str) -> Vec<Vec<Vec<char>>> {
+    let file = File::open(filename).expect(&format!("[File {} not found!]", filename));
+    let reader = BufReader::new(file);
+
+    let mut matrices: Vec<Vec<Vec<char>>> = Vec::new();
+    let mut current_matrix: Vec<Vec<char>> = Vec::new();
+
+    for line in reader.lines() {
+        match line {
+            Ok(text) => {
+                if text.trim().is_empty() {
+                    if !current_matrix.is_empty() {
+                        matrices.push(current_matrix.clone());
+                        current_matrix.clear();
+                    }
+                } else {
+                    let row: Vec<char> = text.chars().collect();
+                    current_matrix.push(row);
+                }
+            }
+            Err(err) => eprintln!("Error reading line: {}", err),
+        }
+    }
+
+    if !current_matrix.is_empty() {
+        matrices.push(current_matrix);
+    }
+
+    return matrices;
+}
+
+// The print_mat function can be used as it is for displaying the matrices.
