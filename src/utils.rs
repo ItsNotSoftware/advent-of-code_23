@@ -56,6 +56,7 @@ where
         }
         println!();
     }
+    println!();
 }
 
 pub fn read_matrices(filename: &str) -> Vec<Vec<Vec<char>>> {
