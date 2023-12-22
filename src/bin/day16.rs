@@ -1,9 +1,11 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
+use rayon::prelude::*;
+
 type Map = Vec<Vec<char>>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Beam {
     l: usize,
     c: usize,
@@ -106,9 +108,8 @@ fn move_beam(beams: &mut Vec<Beam>, energised: &mut Vec<Vec<bool>>, tile: &mut c
     }
 }
 
-fn part1(filename: &str) -> usize {
-    let mut map: Map = utils::read_chars(filename);
-    let mut beams = vec![Beam::new(0, 0, 0, 1)];
+fn part1(mut map: Map, b: Beam) -> usize {
+    let mut beams = vec![b];
     let mut energised = vec![vec![false; map[0].len()]; map.len()];
 
     while beams.len() > 0 {
@@ -124,13 +125,43 @@ fn part1(filename: &str) -> usize {
         .count()
 }
 
-fn part2(filename: &str) -> usize {
-    todo!();
+fn part2(map: Map) -> usize {
+    let n_lines = map.len();
+    let n_columns = map[0].len();
+    let mut beams: Vec<Beam> = vec![
+        Beam::new(0, 0, 0, 1),
+        Beam::new(0, 0, 1, 0),
+        Beam::new(n_lines - 1, 0, 0, 1),
+        Beam::new(n_lines - 1, 0, -1, 0),
+        Beam::new(0, n_columns - 1, 0, -1),
+        Beam::new(0, n_columns - 1, 1, 0),
+        Beam::new(n_lines - 1, n_columns - 1, -1, 0),
+        Beam::new(n_lines - 1, n_columns - 1, 0, -1),
+    ];
+
+    for i in 1..(n_lines - 1) {
+        beams.push(Beam::new(i, 0, 0, 1));
+        beams.push(Beam::new(i, n_columns - 1, 0, -1));
+    }
+
+    for i in 1..(n_columns - 1) {
+        beams.push(Beam::new(0, i, 1, 0));
+        beams.push(Beam::new(n_lines - 1, i, -1, 0));
+    }
+
+    // Use parallel iterator here
+    beams
+        .par_iter()
+        .map(|b| part1(map.clone(), b.clone())) // Use map to compute score for each beam
+        .max() // Find the maximum score
+        .unwrap_or(0) // Return 0 if there are no beams
 }
 
 fn main() {
-    println!("Part1: {}", part1("inputs/day16.txt"));
-    println!("Part2: {}", part2("inputs/day16.txt"));
+    let map: Map = utils::read_chars("inputs/day16.txt");
+
+    println!("Part1: {}", part1(map.clone(), Beam::new(0, 0, 0, 1)));
+    println!("Part2: {}", part2(map));
 }
 
 // *====================== Tests ======================* //
@@ -141,11 +172,15 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        let r = part1("examples/day16.txt");
+        let map: Map = utils::read_chars("examples/day16.txt");
+        let r = part1(map, Beam::new(0, 0, 0, 1));
         assert_eq!(r, 46);
     }
 
+    #[test]
     fn test_part2() {
-        todo!();
+        let map: Map = utils::read_chars("examples/day16.txt");
+        let r = part2(map);
+        assert_eq!(r, 51);
     }
 }
