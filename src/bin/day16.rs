@@ -19,33 +19,6 @@ impl Beam {
     }
 }
 
-fn print_map(map: &Map, b: &Beam, energised: &mut Vec<Vec<bool>>) {
-    let x = (b.vl, b.vc);
-    let marker;
-    match x {
-        (0, 1) => marker = '>',
-        (0, -1) => marker = '<',
-        (1, 0) => marker = 'v',
-        (-1, 0) => marker = '^',
-        _ => marker = 'X',
-    }
-
-    println!();
-    for line in 0..map.len() {
-        for c in 0..map[0].len() {
-            if line == b.l && c == b.c {
-                print!("{}", marker);
-            } else if energised[line][c] && map[line][c] == '.' {
-                print!("#");
-            } else {
-                print!("{}", map[line][c]);
-            }
-        }
-        println!();
-    }
-    println!();
-}
-
 fn move_beam(beams: &mut Vec<Beam>, energised: &mut Vec<Vec<bool>>, tile: &mut char) {
     let vl_prev = beams[0].vl;
     let vc_prev = beams[0].vc;
