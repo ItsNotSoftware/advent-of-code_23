@@ -149,12 +149,11 @@ fn part2(map: Map) -> usize {
         beams.push(Beam::new(n_lines - 1, i, -1, 0));
     }
 
-    // Use parallel iterator here
     beams
         .par_iter()
         .map(|b| part1(map.clone(), b.clone())) // Use map to compute score for each beam
-        .max() // Find the maximum score
-        .unwrap_or(0) // Return 0 if there are no beams
+        .max()
+        .unwrap_or(0)
 }
 
 fn main() {
