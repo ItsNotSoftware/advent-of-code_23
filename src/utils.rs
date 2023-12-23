@@ -32,6 +32,21 @@ pub fn read_chars(filename: &str) -> Vec<Vec<char>> {
     return vec;
 }
 
+pub fn read_matrix(filename: &str) -> Vec<Vec<u32>> {
+    let file = File::open(filename).expect("Failed to open file");
+
+    let reader = BufReader::new(file);
+    let mut matrix: Vec<Vec<u32>> = Vec::new();
+
+    for line in reader.lines() {
+        let line = line.expect("Failed to read line");
+        let nums: Vec<u32> = line.chars().filter_map(|c| c.to_digit(10)).collect();
+        matrix.push(nums);
+    }
+
+    matrix
+}
+
 pub fn read_file(filename: &str) -> String {
     let mut file = match File::open(filename) {
         Ok(file) => file,
