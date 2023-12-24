@@ -25,6 +25,7 @@ mod tests {
         todo!();
     }
 
+    #[test]
     fn test_part2() {
         todo!();
     }

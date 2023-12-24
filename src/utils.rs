@@ -1,6 +1,8 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read};
 
+pub type Mat<T> = Vec<Vec<T>>;
+
 pub fn read_lines(filename: &str) -> Vec<String> {
     let file = File::open(filename).expect(&format!("[File {} not found!]", filename));
     let reader = BufReader::new(file);
