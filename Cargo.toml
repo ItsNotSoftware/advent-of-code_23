@@ -10,3 +10,4 @@ path = "src/utils.rs"
 [dependencies]
 log = "0.4"
 rayon = "1.5.1"
+regex = "1.10.2"
